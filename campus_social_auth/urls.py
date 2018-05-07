@@ -5,8 +5,10 @@ URLs for campus_social_auth.
 from __future__ import absolute_import, unicode_literals
 
 from django.conf.urls import url
-from django.views.generic import TemplateView
+
+from .views import HintUsernameView
+
 
 urlpatterns = [
-    url(r'', TemplateView.as_view(template_name="campus_social_auth/base.html")),
+    url(r'^hint_username_details', HintUsernameView.as_view()),
 ]
