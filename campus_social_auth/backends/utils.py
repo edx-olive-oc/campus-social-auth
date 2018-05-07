@@ -73,7 +73,7 @@ def update_username_suggestion(details, provider_conf):
     """
 
     username_generator_settings = provider_conf.get('USERNAME_GENERATOR', {})
-    basename = details['username'] or details['fullname']
+    basename = details['fullname'] or details['username']
     username_generator = UsernameGenerator(username_generator_settings)
     username = username_generator.generate_username(basename)
     details.update({'username': username})
