@@ -39,6 +39,6 @@ def get_oauth_provider_config(name):
     """
     # Importing module here to avoid circular reference
     from third_party_auth.models import OAuth2ProviderConfig
-    provider_config = OAuth2ProviderConfig.objects.latest("change_date")
+    provider_config = OAuth2ProviderConfig.current(name)
     settings = json.loads(provider_config.other_settings)
     return settings

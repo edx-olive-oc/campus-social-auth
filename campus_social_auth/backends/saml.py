@@ -19,6 +19,7 @@ class CampusSAMLAuthBackend(SAMLAuthBackend):
         then updates the dict with values from whatever additional fields are desired.
         """
         details = super(CampusSAMLAuthBackend, self).get_user_details(attributes)
-        details = update_username_suggestion(details, self.conf)
+        provider = self.get_idp(self.name)
+        details = update_username_suggestion(details, provider.conf)
 
         return details
