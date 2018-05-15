@@ -20,6 +20,10 @@ class HintUsernameView(APIView):
     returns the received base username.
     """
 
+    # This end-point is available to anonymous users,
+    # so do not require authentication.
+    authentication_classes = []
+
     def get(self, request):
         """
         Returns a valid username suggestion checking against the database.
