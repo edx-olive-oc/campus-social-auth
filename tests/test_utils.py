@@ -1,17 +1,14 @@
 from mock import patch
 
-from django.test import override_settings
+from django.test import TestCase
 from django.contrib.auth.models import User
 
-from third_party_auth.utils import UsernameGenerator
-from third_party_auth.tests import testutil
+from campus_social_auth.backends.utils import UsernameGenerator
 
 
-@override_settings(FEATURES={"ENABLE_REGISTRATION_USERNAME_SUGGESTION": True})
-class GenerateUsernameTestCase(testutil.TestCase):
+class GenerateUsernameTestCase(TestCase):
 
     def setUp(self):
-        self.enable_saml()
         self.user = User.objects.create(
             username='my_self_user'
         )
@@ -23,14 +20,8 @@ class GenerateUsernameTestCase(testutil.TestCase):
         full name string. This test makes sure that we are generating a username replacing
         all whitespaces by a character configured in settings or in site_configurations.
         """
-        saml = self.configure_saml_provider(
-            enabled=True,
-            name="Saml Test",
-            idp_slug="test",
-            backend_name="saml_backend",
-            other_settings={'SEPARATOR': '.'}
-        )
-        generator = UsernameGenerator(saml.other_settings)
+        saml_other_settings = {'SEPARATOR': '.'}
+        generator = UsernameGenerator(saml_other_settings)
         username = generator.replace_separator(self.fullname)
         return self.assertEqual(username, "My.Self.User")
 
@@ -39,14 +30,8 @@ class GenerateUsernameTestCase(testutil.TestCase):
         Test if the full name that comes from insert_separator method
         it's converted in lowercase.
         """
-        saml = self.configure_saml_provider(
-            enabled=True,
-            name="Saml Test",
-            idp_slug="test",
-            backend_name="saml_backend",
-            other_settings={'LOWER': True}
-        )
-        generator = UsernameGenerator(saml.other_settings)
+        saml_other_settings = {'LOWER': True}
+        generator = UsernameGenerator(saml_other_settings)
         new_username = generator.process_case('My_Self_User')
         return self.assertEqual(new_username, 'my_self_user')
 
@@ -56,14 +41,8 @@ class GenerateUsernameTestCase(testutil.TestCase):
         is not converted in lowercase and preserves their original lowercases and
         uppers cases.
         """
-        saml = self.configure_saml_provider(
-            enabled=True,
-            name="Saml Test",
-            idp_slug="test",
-            backend_name="saml_backend",
-            other_settings={'LOWER': False}
-        )
-        generator = UsernameGenerator(saml.other_settings)
+        saml_other_settings = {'LOWER': False}
+        generator = UsernameGenerator(saml_other_settings)
         new_username = generator.process_case('My_Self_User')
         return self.assertEqual(new_username, 'My_Self_User')
 
@@ -71,18 +50,12 @@ class GenerateUsernameTestCase(testutil.TestCase):
         """
         It should return a new user with a consecutive number.
         """
-        saml = self.configure_saml_provider(
-            enabled=True,
-            name="Saml Test",
-            idp_slug="test",
-            backend_name="saml_backend",
-            other_settings={'RANDOM': False}
-        )
+        saml_other_settings = {'RANDOM': False}
         for i in range(1, 6):
             User.objects.create(
                 username='my_self_user_{}'.format(i)
             )
-        generator = UsernameGenerator(saml.other_settings)
+        generator = UsernameGenerator(saml_other_settings)
         new_username = generator.generate_username(self.fullname)
         # We have 6 users: Five created in the loop with a consecutive
         # number and another one that comes from initial setUp,
@@ -91,41 +64,29 @@ class GenerateUsernameTestCase(testutil.TestCase):
         # the consecutive number 6.
         return self.assertEqual(new_username, 'my_self_user_6')
 
-    @patch('third_party_auth.utils.UsernameGenerator.get_random')
+    @patch('campus_social_auth.backends.utils.UsernameGenerator.get_random')
     def test_generate_username_with_random(self, mock_random):
         """
         It should return a username with a random integer
         at the end of the username generated.
         """
-        saml = self.configure_saml_provider(
-            enabled=True,
-            name="Saml Test",
-            idp_slug="test",
-            backend_name="saml_backend",
-            other_settings={'RANDOM': True}
-        )
+        saml_other_settings = {'RANDOM': True}
         mock_random.return_value = 4589
-        generator = UsernameGenerator(saml.other_settings)
+        generator = UsernameGenerator(saml_other_settings)
         new_username = generator.generate_username(self.fullname)
         return self.assertEqual(new_username, 'my_self_user_4589')
 
-    @patch('third_party_auth.utils.UsernameGenerator.get_random')
+    @patch('campus_social_auth.backends.utils.UsernameGenerator.get_random')
     def test_generate_username_with_repetitive_random(self, mock_random):
         """
         If a random generated number is repeated, should append
         a suffix with another random that does not exists.
         """
-        saml = self.configure_saml_provider(
-            enabled=True,
-            name="Saml Test",
-            idp_slug="test",
-            backend_name="saml_backend",
-            other_settings={'RANDOM': True}
-        )
+        saml_other_settings = {'RANDOM': True}
         mock_random.side_effect = [4589, 9819]
         User.objects.create(username='my_self_4589')
         User.objects.create(username='my_self')
-        generator = UsernameGenerator(saml.other_settings)
+        generator = UsernameGenerator(saml_other_settings)
         new_username = generator.generate_username('My Self')
         return self.assertEqual(new_username, 'my_self_9819')
 
@@ -135,14 +96,8 @@ class GenerateUsernameTestCase(testutil.TestCase):
         in database, should return the username without
         any modifications of suffix number.
         """
-        saml = self.configure_saml_provider(
-            enabled=True,
-            name="Saml Test",
-            idp_slug="test",
-            backend_name="saml_backend",
-            other_settings={'RANDOM': True}
-        )
+        saml_other_settings = {'RANDOM': True}
         not_existing_user = 'Another Myself'
-        generator = UsernameGenerator(saml.other_settings)
+        generator = UsernameGenerator(saml_other_settings)
         new_username = generator.generate_username(not_existing_user)
         return self.assertEqual(new_username, 'another_myself')
