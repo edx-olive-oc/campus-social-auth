@@ -1,4 +1,5 @@
 from mock import patch
+from six.moves.html_parser import HTMLParser
 
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -45,6 +46,21 @@ class GenerateUsernameTestCase(TestCase):
         generator = UsernameGenerator(saml_other_settings)
         new_username = generator.process_case('My_Self_User')
         return self.assertEqual(new_username, 'My_Self_User')
+
+    def test_generate_username_unicode(self):
+        """
+        Ensure that unique usernames can be generated from unicode base names.
+
+        Uses HTML escaping to accurately reproduce an issue experienced with unicode names in decoded HTML requests.
+        """
+        h = HTMLParser()
+        escaped_name = '&#1495;&#1497;&#1497;&#1501;_&#1506;&#1502;&#1512;&#1504;&#1497;'
+        username = h.unescape(escaped_name)
+        user_exists = User.objects.create(username=username)
+
+        generator = UsernameGenerator()
+        new_username = generator.generate_username(username)
+        return self.assertEqual(new_username, u'{}_1'.format(username))
 
     def test_generate_username_with_consecutive(self):
         """
