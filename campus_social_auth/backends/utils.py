@@ -1,4 +1,3 @@
-
 from random import randint
 
 from django.contrib.auth.models import User
@@ -60,7 +59,7 @@ class UsernameGenerator(object):
             else:
                 suffix = counter
 
-            new_username = '{}{}{}'.format(initial_username, self.separator_character, suffix)
+            new_username = u'{}{}{}'.format(initial_username, self.separator_character, suffix)
             user_exists = User.objects.filter(username=new_username).exists()
             counter = counter + 1
 
