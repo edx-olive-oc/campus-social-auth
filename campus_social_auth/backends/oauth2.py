@@ -1,6 +1,7 @@
 """
 Customized python-social-auth backend for Oauth2 support
 """
+from __future__ import unicode_literals
 import json
 
 from social_core.backends.google import GoogleOAuth2

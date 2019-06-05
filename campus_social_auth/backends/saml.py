@@ -1,7 +1,7 @@
 """
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
-
+from __future__ import unicode_literals
 from third_party_auth.saml import SAMLAuthBackend
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

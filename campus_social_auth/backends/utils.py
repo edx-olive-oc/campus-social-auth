@@ -1,3 +1,7 @@
+"""
+Utilities to support username suggestions based on social auth user details.
+"""
+from __future__ import unicode_literals
 from random import randint
 
 from django.contrib.auth.models import User
