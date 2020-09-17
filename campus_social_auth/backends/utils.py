@@ -25,15 +25,18 @@ class UsernameGenerator(object):
         Replaces spaces with a custom separator.
         The default separator character is an underscore.
         """
-        username = basename.replace(' ', self.separator_character)
-        return username
+        if basename:
+            username = basename.replace(' ', self.separator_character)
+            return username
+        else:
+            return basename
 
     def process_case(self, username):
         """
         If in_lowercase setting is enabled, returns the string downcased,
         otherwise returns the string unmodified.
         """
-        if self.in_lowercase:
+        if username and self.in_lowercase:
             return username.lower()
         else:
             return username
